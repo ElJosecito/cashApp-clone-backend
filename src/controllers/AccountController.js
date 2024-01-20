@@ -2,10 +2,10 @@ const Account = require("../models/AccountModel");
 const User = require("../models/UserModel");
 const TransactionController = require("./TransactionController");
 
+
 //create account
-const createAccount = async (req, res) => {
+const createAccount = async () => {
   try {
-    // Generar automáticamente
     let existingAccount;
     let accNum;
 
@@ -14,7 +14,12 @@ const createAccount = async (req, res) => {
       existingAccount = await Account.findOne({ accountNumber: accNum });
     } while (existingAccount);
 
-    // create account
+    // Verificar si accNum es null y manejarlo adecuadamente
+    if (!accNum) {
+      console.error("Error: El número de cuenta generado es nulo.");
+      throw new Error("Error al generar el número de cuenta.");
+    }
+
     const account = await Account.create({
       accountNumber: accNum,
       balance: 0,
@@ -23,9 +28,10 @@ const createAccount = async (req, res) => {
     return account;
   } catch (error) {
     console.error("Error al crear la cuenta:", error);
-    return res.status(500).json({ error: "Hubo un error al crear la cuenta" });
+    throw error; // Propagar el error para que pueda ser manejado en el nivel superior
   }
 };
+
 
 //add money to account
 const addMoney = async (req, res) => {
@@ -35,7 +41,7 @@ const addMoney = async (req, res) => {
 
     const user = await User.findById(id);
 
-    const account = await Account.findById(user.accountNumber);
+    const account = await Account.findById(user.user_account);
 
     if (!account) {
       return res.status(404).json({ error: "Cuenta no encontrada" });
@@ -99,9 +105,10 @@ const transferMoney = async (req, res) => {
     const { id } = req.params;
     const { amount, accountNumber } = req.body;
 
-    const user = await Account.findById(id);
-
-    const account = await Account.findById(user.accountNumber);
+    const user = await User.findById(id);
+    
+    console.log("user account:" + user)
+    const account = await Account.findById(user.user_account);
 
     if (!account) {
       return res.status(404).json({ error: "Cuenta no encontrada" });

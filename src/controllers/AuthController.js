@@ -20,7 +20,6 @@ const register = async (req, res) => {
 
     // Generar automáticamente el número de cuenta
     const account = await AccountController.createAccount();
-
     // Generar automáticamente la tarjeta
     const card = await CardController.createCard(account._id);
 
@@ -34,8 +33,6 @@ const register = async (req, res) => {
       user_card: card._id,
     });
 
-    // Guardar el usuario
-    await user.save();
     // Devolver una respuesta más descriptiva
     return res.status(201).json({ message: "Usuario registrado exitosamente" });
   } catch (error) {

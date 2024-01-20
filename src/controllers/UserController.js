@@ -13,6 +13,10 @@ const getUser = async (req, res) => {
       .populate({
         path: "user_account",
         select: "accountNumber balance transactions",
+        populate: {
+          path: "transactions",
+          select: "amount type transactionDate"
+        },
       })
       .populate({
         path: "user_card",
